@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Taxi Price Predictor</title>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        width: 95%;
+        max-width: 1200px;
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #1d3557;
+        margin-bottom: 20px;
+        font-size: 40px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    input {
+        padding: 10px;
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #b9c2cf;
+        font-size: 16px;
+    }
+
+    .info {
+        background: #1d3557;
+        color: white;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        line-height: 16px;
+    }
+
+    .tooltip {
+        display: none;
+        position: absolute;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        font-size: 14px;
+        width: 240px;
+        color: #333;
+        z-index: 100;
+    }
+
+    button {
+        width: 100%;
+        padding: 18px;
+        font-size: 22px;
+        margin-top: 25px;
+        background: #1d3557;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #062543;
+    }
+
+    #result {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 36px;
+        font-weight: bold;
+        padding: 25px;
+        border-radius: 12px;
+        background: #e8f2ff;
+        color: #0c457c;
+        display: none;
+    }
+
+    .relative {
+        position: relative;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Taxi Trip Price Prediction</h1>
+
+    <div class="grid">
+
+        <div>
+            <label>Trip Distance (km)</label>
+            <input id="Trip_Distance_km" type="number" value="19.35">
+        </div>
+
+        <div class="relative">
+            <label>Time (0–3) 
+                <span class="info" onclick="toggle('ttTime')">i</span>
+            </label>
+            <input id="Time" type="number" value="0">
+            <div id="ttTime" class="tooltip">
+                <b>Time Encoding</b><br>
+                0 = Morning<br>
+                1 = Afternoon<br>
+                2 = Evening<br>
+                3 = Night
+            </div>
+        </div>
+
+        <div class="relative">
+            <label>Day (0–6)
+                <span class="info" onclick="toggle('ttDay')">i</span>
+            </label>
+            <input id="Day" type="number" value="0">
+            <div id="ttDay" class="tooltip">
+                <b>Day Encoding</b><br>
+                0 = Monday<br>
+                1 = Tuesday<br>
+                2 = Wednesday<br>
+                3 = Thursday<br>
+                4 = Friday<br>
+                5 = Saturday<br>
+                6 = Sunday
+            </div>
+        </div>
+
+        <div>
+            <label>Passenger Count</label>
+            <input id="Passenger_Count" type="number" value="3">
+        </div>
+
+        <div class="relative">
+            <label>Traffic Conditions (0–2)
+                <span class="info" onclick="toggle('ttTraffic')">i</span>
+            </label>
+            <input id="Traffic_Conditions" type="number" value="0">
+            <div id="ttTraffic" class="tooltip">
+                <b>Traffic Encoding</b><br>
+                0 = Light<br>
+                1 = Moderate<br>
+                2 = Heavy
+            </div>
+        </div>
+
+        <div class="relative">
+            <label>Weather (0–2)
+                <span class="info" onclick="toggle('ttWeather')">i</span>
+            </label>
+            <input id="Weather" type="number" value="0">
+            <div id="ttWeather" class="tooltip">
+                <b>Weather Encoding</b><br>
+                0 = Clear<br>
+                1 = Rain<br>
+                2 = Snow
+            </div>
+        </div>
+
+        <div>
+            <label>Base Fare</label>
+            <input id="Base_Fare" type="number" value="3.56">
+        </div>
+
+        <div>
+            <label>Per Km Rate</label>
+            <input id="Per_Km_Rate" type="number" value="0.80">
+        </div>
+
+        <div>
+            <label>Per Minute Rate</label>
+            <input id="Per_Minute_Rate" type="number" value="0.32">
+        </div>
+
+        <div>
+            <label>Trip Duration (minutes)</label>
+            <input id="Trip_Duration_Minutes" type="number" value="53.82">
+        </div>
+
+    </div>
+
+    <button onclick="runPricePrediction()">Predict Trip Price</button>
+    <div id="result"></div>
+</div>
+
+<script src="app.js"></script>
+
+<script>
+function toggle(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+}
+</script>
+
+</body>
+</html>
